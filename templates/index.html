@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{% block title %}
-        Добро пожаловать!
-        Я сервис для работы с записями пользователей
-    {% endblock %}</h1>
+    {% block title %}
+        <h1>Добро пожаловать!</h1>
+        <h2>Я сервис для работы с записями пользователей.</h2>
+    {% endblock %}
     {% for post in posts %}
         <a href="{{ url_for('post', post_id=post['id']) }}">
             <h2>{{ post['title'] }}</h2>
