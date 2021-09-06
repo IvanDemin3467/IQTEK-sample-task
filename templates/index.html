@@ -5,13 +5,16 @@
         <h1>Добро пожаловать!</h1>
         <h2>Я сервис для работы с записями пользователей.</h2>
     {% endblock %}
-    {% for post in posts %}
-        <a href="{{ url_for('post', post_id=post['id']) }}">
-            <h2>{{ post['title'] }}</h2>
+    {% for user in users %}
+        <a href="{{ url_for('user', user_id=user['id']) }}">
+            <h2>{{ user['title'] }}</h2>
         </a>
-        <span class="badge badge-primary">{{ post['created'] }}</span>
-        <a href="{{ url_for('edit', id=post['id']) }}">
-            <span class="badge badge-warning">Edit</span>
+        <a href="{{ url_for('edit', id=user['id']) }}">
+            <span class="badge badge-warning">Редактировать</span>
+        </a>
+        <label>&nbsp;&nbsp;</label>
+        <a href="{{ url_for('delete', id=user['id'], method='POST') }}" >
+            <span class="badge badge-danger">Удалить</span>
         </a>
         <hr>
     {% endfor %}
