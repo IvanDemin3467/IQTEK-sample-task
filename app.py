@@ -75,7 +75,7 @@ def edit(id):
     return render_template('edit.html', user=user)
 
 
-@app.route('/<int:id>/delete', methods=('POST',))
+@app.route('/<int:id>/delete', methods=('GET', 'POST',))
 def delete(id):
     user = get_user(id)
     conn = get_db_connection()
