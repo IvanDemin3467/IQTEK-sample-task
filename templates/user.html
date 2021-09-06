@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>{% block title %} ФИО: {{ user['title'] }} {% endblock %}</h2>
+    <h3>id: {{ user['id'] }}</h3>
+    <h4>Описание: {{ user['description'] }}</h4>
+    <br>
+
+    <form action="{{ url_for('edit', id=user['id']) }}" method="GET">
+        <div class="form-group">
+            <input type="submit" value="Редактировать"
+                class="btn btn-warning btn-sm">
+        </div>
+    </form>
+
+    <form action="{{ url_for('delete', id=user['id']) }}" method="POST">
+        <input type="submit" value="Удалить"
+                class="btn btn-danger btn-sm"
+                onclick="return confirm('Вы уверены, что хотите удалить этого пользователя?')">
+    </form>
+{% endblock %}

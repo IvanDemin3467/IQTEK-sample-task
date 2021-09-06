@@ -1,23 +1,30 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{% block title %} Create a New Post {% endblock %}</h1>
+<h1>{% block title %} Создать пользователя {% endblock %}</h1>
 
-<form method="post">
+<form method="POST">
     <div class="form-group">
-        <label for="title">Title</label>
+        <label for="title">ФИО</label>
         <input type="text" name="title"
-               placeholder="Post title" class="form-control"
-               value="{{ request.form['title'] }}"></input>
+               placeholder="ФИО пользователя" class="form-control"
+               value="{{ request.form['title'] }}">
     </div>
 
     <div class="form-group">
-        <label for="content">Content</label>
-        <textarea name="content" placeholder="Post content"
-                  class="form-control">{{ request.form['content'] }}</textarea>
+        <label for="description">Описание</label>
+        <textarea name="description" placeholder="Описание пользователя"
+                  class="form-control">{{ request.form['description'] }}</textarea>
     </div>
     <div class="form-group">
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
     </div>
 </form>
+
+<form action="{{ url_for('index') }}" method="GET">
+    <div class="form-group">
+        <button type="submit" class="btn btn-secondary">Отменить</button>
+    </div>
+</form>
+
 {% endblock %}
