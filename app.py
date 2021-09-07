@@ -11,8 +11,8 @@ class Repo:
     def __init__(self):
         self.options = self.get_options()
         # self.connection = self.get_db_connection()
-        self.add_user("3245", "dfg")
         print(self.get_users())
+        print(self.del_user(12))
 
     def get_options(self):
         """
@@ -78,7 +78,7 @@ class Repo:
         return result
 
     def get_user(self, user_id):
-        result = self.make_query(f'SELECT * FROM users WHERE id = {user_id}')
+        result = self.make_query(f'SELECT * FROM users WHERE id = {user_id}')[0]
         return result
 
     def get_users(self):
@@ -87,6 +87,10 @@ class Repo:
 
     def add_user(self, title, description):
         result = self.make_query(f"INSERT INTO users (title, description) VALUES ('{title}', '{description}');")
+        return result
+
+    def del_user(self, user_id):
+        result = self.make_query(f"DELETE FROM users WHERE id = {user_id};")
         return result
 
 def get_db_connection():
@@ -112,16 +116,12 @@ repo = Repo()
 
 @app.route('/')
 def index():
-    # conn = get_db_connection()
-    # users = conn.execute('SELECT * FROM users').fetchall()
-    # conn.close()
     users = repo.get_users()
     return render_template('index.html', users=users)
 
 
 @app.route('/<int:user_id>')
 def user(user_id):
-    # user = get_user(user_id)
     user = repo.get_user(user_id)
     return render_template('user.html', user=user)
 
@@ -135,11 +135,6 @@ def create():
         if not title:
             flash('Title is required!')
         else:
-            # conn = get_db_connection()
-            # conn.execute('INSERT INTO users (title, description) VALUES (?, ?)',
-            #              (title, description))
-            # conn.commit()
-            # conn.close()
             repo.add_user(title, description)
             return redirect(url_for('index'))
 
@@ -170,17 +165,14 @@ def edit(id):
 
 @app.route('/<int:id>/delete', methods=('GET', 'POST',))
 def delete(id):
-    user = get_user(id)
-    conn = get_db_connection()
-    conn.execute('DELETE FROM users WHERE id = ?', (id,))
-    conn.commit()
-    conn.close()
-    flash('"{}" was successfully deleted!'.format(user['title']))
+    user = repo.get_user(id)
+    repo.del_user(id)
+    flash(f'{user["title"]} was successfully deleted!')
     return redirect(url_for('index'))
 
 
 if __name__ == '__main__':
-    # This is used when running locally only. When deploying to Google App
-    # Engine, a webserver process such as Gunicorn will serve the app. This
-    # can be configured by adding an `entrypoint` to app.yaml.
+    """
+    This is used when running locally only.
+    """
     app.run(host="127.0.0.1", port=80)
