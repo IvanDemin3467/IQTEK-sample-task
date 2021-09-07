@@ -11,7 +11,7 @@ class Repo:
     def __init__(self):
         self.options = self.get_options()
         # self.connection = self.get_db_connection()
-        print(self.get_user(2))
+        print(self.get_users())
 
     def get_options(self):
         """
@@ -62,17 +62,25 @@ class Repo:
                     database=DB_NAME,
             )
         except Error as e:
-            self.options["error"] = e
+            print(e)
 
-    def get_user(self, user_id):
+    def make_query(self, query):
         conn = self.get_db_connection()
         with conn.cursor(dictionary=True) as cursor:
-            cursor.execute(f'SELECT * FROM users WHERE id = {user_id}')
-            result = cursor.fetchone()
+            cursor.execute(query)
+            result = cursor.fetchall()
             cursor.close()
         conn.close()
         if result is None:
             abort(404)
+        return result
+
+    def get_user(self, user_id):
+        result = self.make_query(f'SELECT * FROM users WHERE id = {user_id}')
+        return result
+
+    def get_users(self):
+        result = self.make_query('SELECT * FROM users LIMIT 5')
         return result
 
 def get_db_connection():
@@ -101,6 +109,7 @@ def index():
     conn = get_db_connection()
     users = conn.execute('SELECT * FROM users').fetchall()
     conn.close()
+    users = repo.get_users()
     return render_template('index.html', users=users)
 
 
