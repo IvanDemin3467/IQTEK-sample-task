@@ -10,7 +10,8 @@ DB_NAME = "sample_database"
 class Repo:
     def __init__(self):
         self.options = self.get_options()
-        # self.connection
+        # self.connection = self.get_db_connection()
+        print(self.get_user(2))
 
     def get_options(self):
         """
@@ -54,14 +55,25 @@ class Repo:
 
     def get_db_connection(self):
         try:
-            with connect(
+            return connect(
                     host="localhost",
                     user=self.options["username"],
                     password=self.options["password"],
-                    database=DB_NAME) as connection:
-                return connection
+                    database=DB_NAME,
+            )
         except Error as e:
-            print(e)
+            self.options["error"] = e
+
+    def get_user(self, user_id):
+        conn = self.get_db_connection()
+        with conn.cursor(dictionary=True) as cursor:
+            cursor.execute(f'SELECT * FROM users WHERE id = {user_id}')
+            result = cursor.fetchone()
+            cursor.close()
+        conn.close()
+        if result is None:
+            abort(404)
+        return result
 
 def get_db_connection():
     conn = sqlite3.connect('database.db')
