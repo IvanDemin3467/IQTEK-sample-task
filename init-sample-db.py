@@ -25,6 +25,20 @@ try:
             password=app.repo.options["password"],
             database=app.DB_NAME,
             ) as connection:
+        query = """
+            CREATE DATABASE users;
+            DROP TABLE IF EXISTS users;
+            CREATE TABLE users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(100) NOT NULL,
+                description VARCHAR(255) NOT NULL);
+            DESCRIBE users
+            INSERT INTO users (title, description)
+                VALUES ('Пётр Первый', 'Последний царь всея Руси');
+            INSERT INTO users (title, description)
+                VALUES ('Александр Сергеевич Пушкин', 'Великий русский поэт');
+            SELECT * FROM users;
+        """
         create_table_query = """
             DROP TABLE IF EXISTS users;
             """
@@ -80,7 +94,7 @@ try:
             password=app.repo.options["password"],
             database=app.DB_NAME,
             ) as connection:
-        query = "SELECT * FROM users"
+        query = "SELECT * FROM users;"
         with connection.cursor() as cursor:
             cursor.execute(query)
             print(cursor.fetchall())

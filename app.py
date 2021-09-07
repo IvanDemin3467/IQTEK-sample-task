@@ -80,7 +80,12 @@ class Repo:
         return result
 
     def get_users(self):
-        result = self.make_query('SELECT * FROM users LIMIT 5')
+        result = self.make_query('SELECT * FROM users')
+        return result
+
+    def add_user(self, title, description):
+        result = self.make_query(f"""INSERT INTO users (title, description) 
+                                    VALUES ({title}, {description});""")
         return result
 
 def get_db_connection():
@@ -106,16 +111,17 @@ repo = Repo()
 
 @app.route('/')
 def index():
-    conn = get_db_connection()
-    users = conn.execute('SELECT * FROM users').fetchall()
-    conn.close()
+    # conn = get_db_connection()
+    # users = conn.execute('SELECT * FROM users').fetchall()
+    # conn.close()
     users = repo.get_users()
     return render_template('index.html', users=users)
 
 
 @app.route('/<int:user_id>')
 def user(user_id):
-    user = get_user(user_id)
+    # user = get_user(user_id)
+    user = repo.get_user(user_id)
     return render_template('user.html', user=user)
 
 
@@ -133,6 +139,7 @@ def create():
                          (title, description))
             conn.commit()
             conn.close()
+            repo.add_user(title, description)
             return redirect(url_for('index'))
 
     return render_template('create.html')
