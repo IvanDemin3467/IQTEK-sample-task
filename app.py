@@ -1,44 +1,48 @@
 import sqlite3
+from mysql.connector import connect, Error
 from flask import Flask, render_template, request, url_for, flash, redirect
 from werkzeug.exceptions import abort
 
-OPTIONS_FILE = "options.txt"
+OPTIONS_FILE_PATH = "options.txt"
+DB_NAME = "sample_database"
 
 
 class Repo:
     def __init__(self):
         self.options = self.get_options()
+        # self.connection
 
     def get_options(self):
         """
-        It reads parameters for query from file: lower_date, upper_date, first_week
-        Those params are to be passed to function list_events_by_guest()
-        which lists events, filtered by params
-        Input = file name
+        It reads parameters from file at OPTIONS_FILE_PATH
         Output = dict of options
         """
 
-        options = {"use_db": False, "username": None, "password": None}
+        options = {"use_db_repo": False, "use_ram_repo": False, "username": None, "password": None,
+                   "error": ""}
 
         try:
-            s = open(OPTIONS_FILE, "rt", encoding="utf-8")
+            s = open(OPTIONS_FILE_PATH, "rt", encoding="utf-8")
             stream = list(s)
             s.close()
         except:
-            flash("Error while dealing with options file")
+            options["error"] = "Got exception while reading options from file"
             return options
 
         for line in stream:
-            # do not read comments
-            if line.lstrip().startswith("#"):
+            if line.lstrip().startswith("#"):  # do not read comments
                 continue
             line = line.rstrip("\n")
             # read content of string
             fragments = line.split(":")
             # do we use db?
-            if "use_db" in fragments[0]:
+            if "use_db_repo" in fragments[0]:
                 if "True" in fragments[1]:
-                    options["use_db"] = True
+                    options["use_db_repo"] = True
+            # do we use db?
+            if "use_ram_repo" in fragments[0]:
+                if "True" in fragments[1]:
+                    options["use_ram_repo"] = True
             # username to connect to db
             elif "username" in fragments[0]:
                 options["username"] = fragments[1]
@@ -48,6 +52,16 @@ class Repo:
 
         return options
 
+    def get_db_connection(self):
+        try:
+            with connect(
+                    host="localhost",
+                    user=self.options["username"],
+                    password=self.options["password"],
+                    database=DB_NAME) as connection:
+                return connection
+        except Error as e:
+            print(e)
 
 def get_db_connection():
     conn = sqlite3.connect('database.db')
