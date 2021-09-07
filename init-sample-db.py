@@ -26,13 +26,13 @@ try:
             database=app.DB_NAME,
             ) as connection:
         query = """
-            CREATE DATABASE users;
+            CREATE DATABASE sample_database;
             DROP TABLE IF EXISTS users;
             CREATE TABLE users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 title VARCHAR(100) NOT NULL,
                 description VARCHAR(255) NOT NULL);
-            DESCRIBE users
+            DESCRIBE users;
             INSERT INTO users (title, description)
                 VALUES ('Пётр Первый', 'Последний царь всея Руси');
             INSERT INTO users (title, description)

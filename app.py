@@ -11,6 +11,7 @@ class Repo:
     def __init__(self):
         self.options = self.get_options()
         # self.connection = self.get_db_connection()
+        self.add_user("3245", "dfg")
         print(self.get_users())
 
     def get_options(self):
@@ -70,6 +71,7 @@ class Repo:
             cursor.execute(query)
             result = cursor.fetchall()
             cursor.close()
+        conn.commit()
         conn.close()
         if result is None:
             abort(404)
@@ -84,8 +86,7 @@ class Repo:
         return result
 
     def add_user(self, title, description):
-        result = self.make_query(f"""INSERT INTO users (title, description) 
-                                    VALUES ({title}, {description});""")
+        result = self.make_query(f"INSERT INTO users (title, description) VALUES ('{title}', '{description}');")
         return result
 
 def get_db_connection():
@@ -134,11 +135,11 @@ def create():
         if not title:
             flash('Title is required!')
         else:
-            conn = get_db_connection()
-            conn.execute('INSERT INTO users (title, description) VALUES (?, ?)',
-                         (title, description))
-            conn.commit()
-            conn.close()
+            # conn = get_db_connection()
+            # conn.execute('INSERT INTO users (title, description) VALUES (?, ?)',
+            #              (title, description))
+            # conn.commit()
+            # conn.close()
             repo.add_user(title, description)
             return redirect(url_for('index'))
 
