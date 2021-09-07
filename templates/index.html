@@ -9,11 +9,11 @@
         <a href="{{ url_for('user', user_id=user['id']) }}">
             <h2>{{ user['title'] }}</h2>
         </a>
-        <a href="{{ url_for('edit', id=user['id']) }}">
+        <a href="{{ url_for('edit', user_id=user['id']) }}">
             <span class="badge badge-warning">Редактировать</span>
         </a>
         <label>&nbsp;&nbsp;</label>
-        <a href="{{ url_for('delete', id=user['id'], method='POST') }}"
+        <a href="{{ url_for('delete', user_id=user['id'], method='POST') }}"
                 onclick="return confirm('Вы уверены, что хотите удалить этого пользователя?')">
             <span class="badge badge-danger">Удалить</span>
         </a>

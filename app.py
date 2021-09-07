@@ -12,7 +12,7 @@ class Repo:
         self.options = self.get_options()
         # self.connection = self.get_db_connection()
         print(self.get_users())
-        print(self.del_user(12))
+        print(self.upd_user(20, "123", "456"))
 
     def get_options(self):
         """
@@ -93,6 +93,12 @@ class Repo:
         result = self.make_query(f"DELETE FROM users WHERE id = {user_id};")
         return result
 
+    def upd_user(self, user_id, title, description):
+        result = self.make_query(f"""UPDATE users 
+                                     SET title = '{title}', description = '{description}'  
+                                     WHERE id = '{user_id}'""")
+        return result
+
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
@@ -141,9 +147,9 @@ def create():
     return render_template('create.html')
 
 
-@app.route('/<int:id>/edit', methods=('GET', 'POST'))
-def edit(id):
-    user = get_user(id)
+@app.route('/<int:user_id>/edit', methods=('GET', 'POST'))
+def edit(user_id):
+    user = repo.get_user(user_id)
 
     if request.method == 'POST':
         title = request.form['title']
@@ -152,21 +158,16 @@ def edit(id):
         if not title:
             flash('Title is required!')
         else:
-            conn = get_db_connection()
-            conn.execute('UPDATE users SET title = ?, description = ?'
-                         ' WHERE id = ?',
-                         (title, description, id))
-            conn.commit()
-            conn.close()
+            repo.upd_user(user_id, title, description)
             return redirect(url_for('index'))
 
     return render_template('edit.html', user=user)
 
 
-@app.route('/<int:id>/delete', methods=('GET', 'POST',))
-def delete(id):
-    user = repo.get_user(id)
-    repo.del_user(id)
+@app.route('/<int:user_id>/delete', methods=('GET', 'POST',))
+def delete(user_id):
+    user = repo.get_user(user_id)
+    repo.del_user(user_id)
     flash(f'{user["title"]} was successfully deleted!')
     return redirect(url_for('index'))
 
