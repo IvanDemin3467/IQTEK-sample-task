@@ -1,0 +1,8 @@
+# do we use DB?
+use_db: True
+
+# username to connect to db
+username: sample-username
+
+# password to connect to db
+password: sample-password
