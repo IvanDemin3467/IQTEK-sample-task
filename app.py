@@ -6,15 +6,7 @@ OPTIONS_FILE_PATH = "options.txt"
 DB_NAME = "sample_database"
 
 
-class EntryRAM():
-    __index = 0
-
-    def __init__(self, title, description):
-        EntryRAM.__index += 1
-        entry = {"id": EntryRAM.__index, "title": title, "description": description}
-
-
-class ControllerRAM():
+class ControllerRAM:
     __index = 0
 
     def __init__(self, options):
