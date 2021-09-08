@@ -6,7 +6,67 @@ OPTIONS_FILE_PATH = "options.txt"
 DB_NAME = "sample_database"
 
 
-class DB_controller():
+class EntryRAM():
+    __index = 0
+
+    def __init__(self, title, description):
+        EntryRAM.__index += 1
+        entry = {"id": EntryRAM.__index, "title": title, "description": description}
+
+
+class ControllerRAM():
+    __index = 0
+
+    def __init__(self, options):
+        self.options = options
+        print(self.init_db())
+
+    def init_db(self):
+        self.db = []
+        self.add_user("Пётр Первый", "Последний царь всея Руси")
+        self.add_user("Александр Сергеевич Пушкин", "Великий русский поэт")
+        return self.db
+
+    def get_user(self, user_id):
+        for entry in self.db:
+            if entry["id"] == user_id:
+                return entry
+        return -1
+
+    def get_users(self):
+        result = self.db
+        return result
+
+    def add_user(self, title, description):
+        ControllerRAM.__index += 1
+        new_user = {"id": ControllerRAM.__index, "title": title, "description": description}
+        self.db.append(new_user)
+        return new_user
+
+    def get_index(self, user_id):
+        for i in range(len(self.db)):
+            entry = self.db[i]
+            if entry["id"] == user_id:
+                return i
+        return -1
+
+    def del_user(self, user_id):
+        i = self.get_index(user_id)
+        if i != -1:
+            del self.db[i]
+            return 1
+        return -1
+
+    def upd_user(self, user_id, title, description):
+        upd_user = {"id": user_id, "title": title, "description": description}
+        i = self.get_index(user_id)
+        if i != -1:
+            self.db[i] = upd_user
+            return upd_user
+        return -1
+
+
+class ControllerDB():
     def __init__(self, options):
         self.options = options
 
@@ -59,7 +119,10 @@ class DB_controller():
 class Repo:
     def __init__(self):
         self.options = self.get_options()
-        self.controller = DB_controller(self.options)
+        if self.options["use_db_repo"]:
+            self.controller = ControllerDB(self.options)
+        else:
+            self.controller = ControllerRAM(self.options)
 
         # self.connection = self.get_db_connection()
         print(self.get_users())
