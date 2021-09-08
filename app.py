@@ -1,4 +1,3 @@
-import sqlite3
 from mysql.connector import connect, Error
 from flask import Flask, render_template, request, url_for, flash, redirect
 from werkzeug.exceptions import abort
@@ -7,52 +6,9 @@ OPTIONS_FILE_PATH = "options.txt"
 DB_NAME = "sample_database"
 
 
-class Repo:
-    def __init__(self):
-        self.options = self.get_options()
-        # self.connection = self.get_db_connection()
-        print(self.get_users())
-        print(self.upd_user(20, "123", "456"))
-
-    def get_options(self):
-        """
-        It reads parameters from file at OPTIONS_FILE_PATH
-        Output = dict of options
-        """
-
-        options = {"use_db_repo": False, "use_ram_repo": False, "username": None, "password": None,
-                   "error": ""}
-
-        try:
-            s = open(OPTIONS_FILE_PATH, "rt", encoding="utf-8")
-            stream = list(s)
-            s.close()
-        except:
-            options["error"] = "Got exception while reading options from file"
-            return options
-
-        for line in stream:
-            if line.lstrip().startswith("#"):  # do not read comments
-                continue
-            line = line.rstrip("\n")
-            # read content of string
-            fragments = line.split(":")
-            # do we use db?
-            if "use_db_repo" in fragments[0]:
-                if "True" in fragments[1]:
-                    options["use_db_repo"] = True
-            # do we use db?
-            if "use_ram_repo" in fragments[0]:
-                if "True" in fragments[1]:
-                    options["use_ram_repo"] = True
-            # username to connect to db
-            elif "username" in fragments[0]:
-                options["username"] = fragments[1]
-            # password to connect to db
-            elif "password" in fragments[0]:
-                options["password"] = fragments[1]
-
-        return options
+class DB_controller():
+    def __init__(self, options):
+        self.options = options
 
     def get_db_connection(self):
         try:
@@ -99,20 +55,76 @@ class Repo:
                                      WHERE id = '{user_id}'""")
         return result
 
-def get_db_connection():
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row
-    return conn
 
+class Repo:
+    def __init__(self):
+        self.options = self.get_options()
+        self.controller = DB_controller(self.options)
 
-def get_user(user_id):
-    conn = get_db_connection()
-    user = conn.execute('SELECT * FROM users WHERE id = ?',
-                        (user_id,)).fetchone()
-    conn.close()
-    if user is None:
-        abort(404)
-    return user
+        # self.connection = self.get_db_connection()
+        print(self.get_users())
+        print(self.upd_user(20, "123", "456"))
+
+    def get_options(self):
+        """
+        It reads parameters from file at OPTIONS_FILE_PATH
+        Input: se comments in options file
+        Output = dict of options
+        """
+
+        options = {"use_db_repo": False, "use_ram_repo": False, "username": None, "password": None,
+                   "error": ""}
+
+        try:
+            s = open(OPTIONS_FILE_PATH, "rt", encoding="utf-8")
+            stream = list(s)
+            s.close()
+        except:
+            options["error"] = "Got exception while reading options from file"
+            return options
+
+        for line in stream:
+            if line.lstrip().startswith("#"):  # do not read comments
+                continue
+            line = line.rstrip("\n")
+            # read content of string
+            fragments = line.split(":")
+            # do we use db?
+            if "use_db_repo" in fragments[0]:
+                if "True" in fragments[1]:
+                    options["use_db_repo"] = True
+            # do we use db?
+            if "use_ram_repo" in fragments[0]:
+                if "True" in fragments[1]:
+                    options["use_ram_repo"] = True
+            # username to connect to db
+            elif "username" in fragments[0]:
+                options["username"] = fragments[1]
+            # password to connect to db
+            elif "password" in fragments[0]:
+                options["password"] = fragments[1]
+
+        return options
+
+    def get_user(self, user_id):
+        result = self.controller.get_user(user_id)
+        return result
+
+    def get_users(self):
+        result = self.controller.get_users()
+        return result
+
+    def add_user(self, title, description):
+        result = self.controller.add_user(title, description)
+        return result
+
+    def del_user(self, user_id):
+        result = self.controller.del_user(user_id)
+        return result
+
+    def upd_user(self, user_id, title, description):
+        result = self.controller.upd_user(user_id, title, description)
+        return result
 
 
 app = Flask(__name__)
